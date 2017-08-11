@@ -14,6 +14,7 @@
     "express": "^4.15.4",
     "express-graphql": "^0.6.7",
     "graphql": "^0.10.5",
-    "lambda-graphql": "^1.1.0"
+    "lambda-graphql": "^1.1.0",
+	"serverless": "^1.11.0"
   }
 }
