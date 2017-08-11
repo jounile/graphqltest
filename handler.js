@@ -11,6 +11,7 @@ const schema = graphql.buildSchema(`
 
 const root = {
   hello: function(params) {
+	console.log(JSON.stringify(event));
     return 'world'
   }
 }
