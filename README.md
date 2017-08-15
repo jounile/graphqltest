@@ -11,12 +11,6 @@ $ cd graphqltest
 $ npm install
 ```
 
-Configure your AWS environment connection
-
-```sh
-$ sls config credentials --provider aws --key asfd --secret qwer
-```
-
 Deploy your services
 
 ```sh

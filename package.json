@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+	"lint": "standard",
+    "fixStyle": "standard --fix",
     "start": "node index.js"
   },
   "author": "",
@@ -14,6 +16,7 @@
     "express": "^4.15.4",
     "express-graphql": "^0.6.7",
     "graphql": "^0.10.5",
-    "lambda-graphql": "^1.1.0"
+	"lodash": "~4.16.4",
+    "uuid": "~3.0.1"
   }
 }

@@ -1,53 +1,52 @@
 'use strict';
 
-const graphql = require('graphql')
-const lambdaGraphql = require('lambda-graphql')
+const G = require('graphql')
  
-const schema = graphql.buildSchema(`
-  type Query {
-    hello: String
+const schema = G.GraphQLSchema({
+  query: new G.GraphQLObjectType({
+	name: 'RootQueryType',
+	fields: {
+	  hello: {
+		type: G.GraphQLString,
+		// {"hello": "world"}
+		resolve () {
+			return 'world'
+		}
+	  } 
+	}
+    
   }
-`)
+})
 
-const root = {
-  hello: function(params) {
-	console.log(JSON.stringify(event));
-    return 'world'
-  }
+function runQuery (query, claims, variables) {
+  return G.graphql(schema, query, {claims: claims}, null, variables)  
 }
 
-// options passed to lambdaGraphql() are the same as options for express-graphql module
-let app = lambdaGraphql({
-  schema: schema,
-  rootValue: root
-})
-
-// pass handler as `index.handler` for aws lambda
-exports.handler = app.handler
- 
-// shutdown gracefully (process in container is stopped before going to "sleep")
-process.on('exit',() => {
-  app.close()
-})
-process.on('SIGINT',process.exit)
-
-
-// Default sls template
-
-//module.exports.hello = (event, context, callback) => {
-//  const response = {
-//    statusCode: 200,
-//    body: JSON.stringify({
-//      message: 'Go Serverless v1.0! Your function executed successfully!',
-//      input: event,
-//    }),
-//  };
-//
-//  callback(null, response);
-//
-//  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-//  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
-//};
+module.exports.handler = (event, context, callback) => {
+  console.log('Received event', JSON.stringify(event));
+  
+  const userInfo = event.requestContext.authorizer.claims
+  console.log('Event from user ${userInfo.name} with ID ${userInfo.sub}')
+  
+  const request = JSON.parse(event.body)
+  console.log('Query: ' + request.query)
+  console.log('Variables: ' + JSON.stringify(request.variables))
+  
+  return runQuery(request.query, userInfo, request.variables)
+    .then(response => {
+		console.log(response)
+		const respified = {
+			statusCode: 200,
+			headers: { 'Access-Control-Allow-Origin': '*' },
+			body: JSON.stringify(response)
+		}
+		console.log('Built response')
+		console.log(respified)
+		return respified
+	})
+	.then(response => callback(null, response))
+	.catch(err => callback(err))
+}
 
 
 
